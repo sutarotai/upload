@@ -140,10 +140,13 @@ function uploadFileToDrive($file, $password, $token) {
         }
 
         $filesData[] = [
-            'id' => $result['id'],
-            'name' => $file['name'],
-            'password' => $password
-        ];
+			'id' => $result['id'],
+			'name' => $file['name'],
+			'password' => $password,
+			'size' => $file['size'],
+			'uploaded_at' => date('Y-m-d H:i:s')
+		];
+
 
         file_put_contents($jsonFile, json_encode($filesData, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE));
 
