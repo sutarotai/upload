@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: my-upload-app
+    env: php
+    plan: free
+    staticPublishPath: .

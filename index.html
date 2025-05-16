@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<title>Upload File lên Google Drive</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 20px; }
+  #uploadProgress { margin-top: 10px; white-space: pre-wrap; font-family: monospace; }
+</style>
+</head>
+<body>
+
+<h2>Upload File lên Google Drive</h2>
+
+<form id="uploadForm">
+  <input type="file" id="files" name="files" multiple required />
+  <br><br>
+  Mật khẩu file (để trống nếu không đặt): 
+  <input type="text" id="filePassword" name="password" />
+  <br><br>
+  <button type="submit">Upload</button>
+</form>
+
+<div id="uploadProgress"></div>
+
+<script>
+const uploadForm = document.getElementById('uploadForm');
+const filesInput = document.getElementById('files');
+const filePasswordInput = document.getElementById('filePassword');
+const uploadProgress = document.getElementById('uploadProgress');
+
+uploadForm.addEventListener('submit', async e => {
+  e.preventDefault();
+  const files = filesInput.files;
+  const password = filePasswordInput.value.trim();
+  if (files.length === 0) {
+    alert('Vui lòng chọn file để upload');
+    return;
+  }
+  
+  uploadProgress.textContent = '';
+  
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    uploadProgress.textContent += `Đang upload file (${i+1}/${files.length}): ${file.name}\n`;
+    
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('password', password);
+    
+    try {
+      const response = await fetch('upload.php', {
+        method: 'POST',
+        body: formData
+      });
+      const result = await response.json();
+      
+      if (result.success) {
+        uploadProgress.textContent += `✅ Upload thành công: ${file.name}\n\n`;
+      } else {
+        uploadProgress.textContent += `❌ Upload thất bại: ${file.name}\nLỗi: ${result.error}\n\n`;
+      }
+    } catch (err) {
+      uploadProgress.textContent += `❌ Upload thất bại: ${file.name}\nLỗi mạng hoặc server\n\n`;
+    }
+  }
+  
+  uploadProgress.textContent += 'Hoàn thành tất cả file.\n';
+  filesInput.value = '';
+  filePasswordInput.value = '';
+});
+</script>
+
+<p><a href="list.php" target="_blank">Xem danh sách file đã upload và quản lý tại đây</a></p>
+
+</body>
+</html>
